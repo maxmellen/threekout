@@ -16,7 +16,4 @@ module.exports = {
     extensions: [".ts", ".js"],
   },
   devtool: "inline-source-map",
-  devServer: {
-    contentBase: "./dist",
-  },
 };
