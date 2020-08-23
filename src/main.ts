@@ -4,7 +4,7 @@ import fragmentShader from "./monjori.frag";
 
 const FFT_SIZE = 1024;
 
-type UniformNames = "time" | "tAudioData";
+type UniformNames = "time" | "tAudioData" | "ferp";
 
 let gotUserMedia = false;
 
@@ -19,7 +19,8 @@ init();
 animate();
 
 function init(): void {
-  let container = document.getElementById("main")!;
+  let container = document.getElementById("main") as HTMLDivElement;
+  let ferpSlider = document.getElementById("ferp") as HTMLInputElement;
 
   camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   scene = new THREE.Scene();
@@ -48,6 +49,7 @@ function init(): void {
     tAudioData: {
       value: audioDataTexture,
     },
+    ferp: { value: 0.52 },
   };
 
   let material = new THREE.ShaderMaterial({
@@ -64,13 +66,20 @@ function init(): void {
   container.appendChild(renderer.domElement);
 
   onWindowResize();
+  ferpSlider.value = uniforms.ferp.value;
 
   window.addEventListener("resize", onWindowResize);
+  ferpSlider.addEventListener("input", onFerpInput);
   renderer.domElement.addEventListener("click", getUserMedia);
 }
 
 function onWindowResize(): void {
   renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function onFerpInput(event: Event): void {
+  let ferpSlider = event.target as HTMLInputElement;
+  uniforms.ferp.value = ferpSlider.value;
 }
 
 async function getUserMedia(): Promise<void> {
