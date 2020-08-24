@@ -30,15 +30,6 @@ function showInitPrompt(): void {
 }
 
 async function init(): Promise<void> {
-  let stream: MediaStream;
-
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  } catch (e) {
-    console.error("Could not get user media:", e);
-    return;
-  }
-
   camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   scene = new THREE.Scene();
 
@@ -47,8 +38,14 @@ async function init(): Promise<void> {
   camera.add(listener);
 
   sound = new THREE.Audio(listener);
-  sound.setMediaStreamSource(stream);
   analyser = new THREE.AudioAnalyser(sound, FFT_SIZE);
+
+  try {
+    let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    sound.setMediaStreamSource(stream);
+  } catch (e) {
+    console.warn("Could not get user media:", e);
+  }
 
   let geometry = new THREE.PlaneBufferGeometry(2, 2);
 
