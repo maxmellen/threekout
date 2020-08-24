@@ -1,10 +1,18 @@
 varying vec2 vUv;
 
 uniform float time;
+uniform vec2 resolution;
 uniform sampler2D tAudioData;
 
 void main()	{
   vec2 p = - 1.0 + 2.0 * vUv;
+
+  if (resolution.x >= resolution.y) {
+    p.x *= resolution.x / resolution.y;
+  } else {
+    p.y *= resolution.y / resolution.x;
+  }
+
   float a = time * 40.0;
   float d, e, f, g = 1.0 / 40.0, h, i, r, q;
 

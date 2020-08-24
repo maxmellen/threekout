@@ -2,7 +2,7 @@ import * as THREE from "three";
 import vertexShader from "./monjori.vert";
 import fragmentShader from "./monjori.frag";
 
-type UniformNames = "time" | "tAudioData";
+type UniformNames = "time" | "resolution" | "tAudioData";
 
 const FFT_SIZE = 1024;
 
@@ -64,6 +64,7 @@ async function init(): Promise<void> {
 
   uniforms = {
     time: { value: 1.0 },
+    resolution: { value: [window.innerWidth, window.innerHeight] },
     tAudioData: {
       value: audioDataTexture,
     },
@@ -100,5 +101,6 @@ function render(): void {
 }
 
 function onWindowResize(): void {
+  uniforms.resolution.value = [window.innerWidth, window.innerHeight];
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
