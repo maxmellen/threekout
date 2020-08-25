@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import "./style.css";
 import vertexShader from "./monjori.vert";
 import fragmentShader from "./monjori.frag";
 

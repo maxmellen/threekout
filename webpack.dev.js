@@ -1,4 +1,5 @@
 let path = require("path");
+let HtmlWebpackPlugin = require("html-webpack-plugin");
 
 let srcPath = path.resolve(__dirname, "src");
 let distPath = path.resolve(__dirname, "docs");
@@ -15,6 +16,11 @@ module.exports = {
         include: srcPath,
       },
       {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+        include: srcPath,
+      },
+      {
         test: /\.(vert|frag)$/,
         use: "raw-loader",
         include: srcPath,
@@ -24,6 +30,11 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".js"],
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "src/index.html",
+    }),
+  ],
   devtool: "inline-source-map",
   devServer: {
     contentBase: distPath,
