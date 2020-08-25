@@ -89,6 +89,7 @@ async function getUserMedia(): Promise<void> {
   try {
     let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     sound.setMediaStreamSource(stream);
+    sound.context.resume();
   } catch (e) {
     console.warn("Could not get user media:", e);
   }
