@@ -15,19 +15,7 @@ let sound: THREE.Audio;
 let analyser: THREE.AudioAnalyser;
 let uniforms: Record<UniformNames, THREE.IUniform>;
 
-showInitPrompt();
-
-function showInitPrompt(): void {
-  let initButton = document.createElement("button");
-
-  initButton.textContent = "Click here to start";
-  initButton.addEventListener("click", () => {
-    container.removeChild(initButton);
-    init();
-  });
-
-  container.appendChild(initButton);
-}
+init();
 
 async function init(): Promise<void> {
   camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -39,13 +27,6 @@ async function init(): Promise<void> {
 
   sound = new THREE.Audio(listener);
   analyser = new THREE.AudioAnalyser(sound, FFT_SIZE);
-
-  try {
-    let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    sound.setMediaStreamSource(stream);
-  } catch (e) {
-    console.warn("Could not get user media:", e);
-  }
 
   let geometry = new THREE.PlaneBufferGeometry(2, 2);
 
@@ -83,6 +64,8 @@ async function init(): Promise<void> {
   window.addEventListener("resize", onWindowResize);
   onWindowResize();
 
+  renderer.domElement.addEventListener("click", getUserMedia);
+
   requestAnimationFrame(function loop() {
     render();
     requestAnimationFrame(loop);
@@ -100,4 +83,13 @@ function render(): void {
 function onWindowResize(): void {
   uniforms.resolution.value = [window.innerWidth, window.innerHeight];
   renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+async function getUserMedia(): Promise<void> {
+  try {
+    let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    sound.setMediaStreamSource(stream);
+  } catch (e) {
+    console.warn("Could not get user media:", e);
+  }
 }

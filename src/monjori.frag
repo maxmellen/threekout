@@ -18,7 +18,7 @@ void main()	{
 
   float strech = 64.0;
   float offset = 1.0 / 32.0;
-  float ratio = 1.0 / 3.0;
+  float ratio = 1.0 / 2.0;
 
   e = 400.0 * ( p.x * 0.5 + 0.5 );
   f = 400.0 * ( p.y * 0.5 + 0.5 );
@@ -33,7 +33,7 @@ void main()	{
   i = cos( h + r * p.x / 1.3 ) * ( e + e + a ) + cos( q * g * 6.0 ) * ( r + h / 3.0 );
   h = sin( f * g ) * 144.0 - sin( e * g ) * 212.0 * p.x;
   h = ( h + ( f - e ) * q + sin( r - ( a + h ) / 7.0 ) * 10.0 + i / 4.0 ) * g;
-  h *= texture2D(tAudioData, vec2(h / strech + offset, 0.0)).r * ratio + (1.0 - ratio);
+  h *= texture2D(tAudioData, vec2(pow(h / strech, 3.0), 0.0)).r * ratio + (1.0 - ratio);
   i += cos( h * 2.3 * sin( a / 350.0 - q ) ) * 184.0 * sin( q - ( r * 4.3 + a / 12.0 ) * g ) + tan( r * g + h ) * 184.0 * cos( r * g + h );
   i = mod( i / 5.6, 256.0 ) / 64.0;
   if ( i < 0.0 ) i += 4.0;

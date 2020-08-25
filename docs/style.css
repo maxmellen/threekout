@@ -2,15 +2,6 @@ body {
   margin: unset;
 }
 
-#main {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-button {
-  font-size: 1.5em;
+canvas {
+  image-rendering: pixelated;
 }
