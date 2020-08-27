@@ -3,7 +3,7 @@ import "./style.css";
 import vertexShader from "./ray_marching.vert";
 import fragmentShader from "./ray_marching.frag";
 
-type Uniforms = "time" | "resolution";
+type Uniforms = "u_time" | "u_resolution";
 
 let container = document.getElementById("main")!;
 
@@ -21,8 +21,8 @@ async function init(): Promise<void> {
   let geometry = new THREE.PlaneBufferGeometry(2, 2);
 
   uniforms = {
-    time: { value: 0 },
-    resolution: { value: [window.innerWidth, window.innerHeight] },
+    u_time: { value: 0 },
+    u_resolution: { value: [window.innerWidth, window.innerHeight] },
   };
 
   let material = new THREE.ShaderMaterial({
@@ -48,11 +48,11 @@ async function init(): Promise<void> {
 }
 
 function render(): void {
-  uniforms.time.value = performance.now() / 1000;
+  uniforms["u_time"].value = performance.now() / 1000;
   renderer.render(scene, camera);
 }
 
 function onWindowResize(): void {
-  uniforms.resolution.value = [window.innerWidth, window.innerHeight];
+  uniforms["u_resolution"].value = [window.innerWidth, window.innerHeight];
   renderer.setSize(window.innerWidth, window.innerHeight);
 }

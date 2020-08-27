@@ -1,5 +1,5 @@
-uniform float time;
-uniform vec2 resolution;
+uniform float u_time;
+uniform vec2 u_resolution;
 uniform sampler2D tAudioData;
 
 const int MAX_MARCHING_STEPS = 255;
@@ -32,8 +32,53 @@ vec3 rayDirection(float fieldOfView, vec2 size, vec2 fragCoord) {
   return normalize(vec3(xy, -z));
 }
 
+vec3 estimateNormal(vec3 p) {
+  return normalize(vec3(
+    sceneSDF(vec3(p.x + EPSILON, p.y, p.z)) - sceneSDF(vec3(p.x - EPSILON, p.y, p.z)),
+    sceneSDF(vec3(p.x, p.y + EPSILON, p.z)) - sceneSDF(vec3(p.x, p.y - EPSILON, p.z)),
+    sceneSDF(vec3(p.x, p.y, p.z + EPSILON)) - sceneSDF(vec3(p.x, p.y, p.z - EPSILON))
+  ));
+}
+
+vec3 phongContribForLight(vec3 kD, vec3 kS, float alpha, vec3 p, vec3 eye, vec3 lightPos, vec3 lightIntensity) {
+  vec3 N = estimateNormal(p);
+  vec3 L = normalize(lightPos - p);
+  vec3 V = normalize(eye - p);
+  vec3 R = normalize(reflect(-L, N));
+
+  float dotLN = dot(L, N);
+  float dotRV = dot(R, V);
+
+  if (dotLN < 0.0) {
+    return vec3(0.0);
+  }
+
+  if (dotRV < 0.0) {
+    return lightIntensity * (kD * dotLN);
+  }
+
+  return lightIntensity * (kD * dotLN + kS * pow(dotRV, alpha));
+}
+
+vec3 phongIllumination(vec3 kA, vec3 kD, vec3 kS, float alpha, vec3 p, vec3 eye) {
+  const vec3 ambientLight = vec3(0.5);
+
+  vec3 color = ambientLight * kA;
+
+  vec3 light1Pos = vec3(4.0 * sin(u_time), 2.0, 4.0 * cos(u_time));
+  vec3 light1Intensity = vec3(0.4);
+
+  vec3 light2Pos = vec3(2.0 * sin(0.37 * u_time), 2.0 * cos(0.37 * u_time), 2.0);
+  vec3 light2Intensity = vec3(0.4);
+
+  color += phongContribForLight(kD, kS, alpha, p, eye, light1Pos, light1Intensity);
+  color += phongContribForLight(kD, kS, alpha, p, eye, light2Pos, light2Intensity);
+
+  return color;
+}
+
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-  vec3 dir = rayDirection(45.0, resolution.xy, fragCoord);
+  vec3 dir = rayDirection(45.0, u_resolution.xy, fragCoord);
   vec3 eye = vec3(0.0, 0.0, 5.0);
   float dist = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST);
 
@@ -42,7 +87,16 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     return;
   }
 
-  fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+  vec3 p = eye + dist * dir;
+
+  vec3 kA = vec3(0.1, 0.0, 0.3);
+  vec3 kD = vec3(0.0, 0.5, 1.0);
+  vec3 kS = vec3(1.0, 0.7, 0.9);
+  float alpha = 100.0;
+
+  vec3 color = phongIllumination(kA, kD, kS, alpha, p, eye);
+
+  fragColor = vec4(color, 1.0);
 }
 
 void main()	{
